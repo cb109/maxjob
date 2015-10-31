@@ -1,0 +1,13 @@
+paths:
+    max: 'C:\Program Files\Autodesk\3ds Max 2015\3dsmax.exe'
+    networklog: '%LOCALAPPDATA%\Autodesk\3dsMax\2015 - 64bit\ENU\Network\Max.log'
+    maxscriptlog: '%LOCALAPPDATA%\Autodesk\3dsMax\2015 - 64bit\ENU\maxjob_mxs.log'
+
+options:
+    timeout: 3600
+
+prefixes:
+    stdout: stdout
+    stderr: stderr
+    network: network
+    mxs: mxs
