@@ -36,10 +36,4 @@ Usage
 
 Modify *maxjob.yml* to your needs, then call:
 
-    $ python maxjob/__init__.py [MAXSCRIPTFILE] [SCENEFILE]
-
-
-Examples
---------
-
-To be done.
+    $ python -m maxjob [MAXSCRIPTFILE] [SCENEFILE]
