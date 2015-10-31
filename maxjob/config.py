@@ -11,7 +11,7 @@ configfile = "maxjob.yml"
 def get_this_directory():
     """Support querying from inside an executable."""
     if getattr(sys, 'frozen', False):
-            thisdir = os.path.dirname(sys.executable)
+        thisdir = os.path.dirname(sys.executable)
     else:
         thisdir = os.path.dirname(__file__)
     return thisdir
