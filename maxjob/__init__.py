@@ -2,6 +2,7 @@ import logging
 import os
 import pprint
 import Queue
+import tempfile
 
 from twisted.internet import reactor
 
@@ -27,13 +28,57 @@ def log_config():
 log_config()
 
 
+INJECT_MXS_BACKEND_TEMPLATE = """
+-- This fileIn() has been injected by the maxjob tool.
+-- It is needed to load functionality so we can read the mxs log.
+fileIn @"{backendfile}"
+"""
+
+
+def inject_maxscript_backend(maxscriptfile, backendfile, create_copy=True):
+    """Add an import to the maxscript backend to the script.
+
+    By default, this is done on a copy of the script so the original is
+    not modified. That copy is later used as an argument to 3dsmax.exe.
+
+    """
+    def create_copy():
+        """Create a copy like from 'myscript.ms' to
+        'tmpgz7pir.myscript.ms'in the local appdata directory.
+        """
+        filename, ext = os.path.splitext(maxscriptfile)
+        suffix = "." + os.path.basename(filename) + ext
+        workfile_obj = tempfile.NamedTemporaryFile(prefix="maxjob-",
+                                                   suffix=suffix, delete=False)
+        workfile_obj.close()
+        workfile = workfile_obj.name
+        with open(maxscriptfile) as src:
+            with open(workfile, "w") as dest:
+                dest.write(src.read())
+        return workfile
+
+    if create_copy:
+        maxscriptfile = create_copy()
+
+    with open(maxscriptfile) as f:
+        content = f.read()
+    header = INJECT_MXS_BACKEND_TEMPLATE.format(backendfile=backendfile)
+    new_content = header.strip() + "\n\n\n" + content
+    with open(maxscriptfile, "w") as f:
+        f.write(new_content)
+
+
 def main():
     maxbinary = cfg.paths.max
     network_logfile = cfg.paths.networklog
     mxs_logfile = cfg.paths.maxscriptlog
     timeout = cfg.options.timeout
 
-    maxjob_backend = os.path.join(get_this_directory(), "backend.ms")
+    log.info("injecting maxscript backend import")
+    maxscriptfile = r"C:\Users\Buelter\Google Drive\dev\maxjob\myscript.ms"
+    backendfile = os.path.join(get_this_directory(), "backend.ms")
+    inject_maxscript_backend(maxscriptfile, backendfile)
+
     message_queue = Queue.Queue()
 
     def add_to_message_queue(message, prefix=""):
@@ -61,7 +106,7 @@ def main():
     log.info("start max process")
     protocol = MaxJobProcessProtocol(callback=add_to_message_queue,
                                      threads=threads)
-    args = [os.path.basename(maxbinary), "-U", "MAXScript", maxjob_backend]
+    args = [os.path.basename(maxbinary), "-U", "MAXScript", maxscriptfile]
     env = os.environ.update({"MAXJOB_BACKEND_LOGFILE": mxs_logfile})
     proc = reactor.spawnProcess(protocol, maxbinary, args=args, env=env)
 
