@@ -23,7 +23,8 @@ Lots of, why reinvent the wheel! See *setup.py* > *install_requires*.
 Installation
 ------------
 
-This tool has been created with Python 2.7x.
+This tool has been created with Python 2.7.
+The following steps install the tool from a bash::
 
     $ cd maxjob
     $ virtualenv venv
@@ -34,6 +35,6 @@ This tool has been created with Python 2.7x.
 Usage
 -----
 
-Modify *maxjob.yml* to your needs, then call:
+Modify *maxjob.yml* to your needs, then call::
 
     $ python -m maxjob [MAXSCRIPTFILE] [SCENEFILE]
