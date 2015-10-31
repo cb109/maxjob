@@ -85,6 +85,7 @@ def main(maxscriptfile, scenefile):
     # Inject maxscript backend into copy of script.
     log.info("injecting maxscript backend import")
     backendfile = os.path.join(get_this_directory(), "backend.ms")
+    maxscriptfile = os.path.abspath(maxscriptfile)
     maxscriptfile = inject_maxscript_backend(maxscriptfile, backendfile)
 
     # Setup logfile watching and report system.
