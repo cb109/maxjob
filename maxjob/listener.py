@@ -33,24 +33,32 @@ class LogFileChangedHandler(events.PatternMatchingEventHandler):
         self.callback(diff)
 
 
-def test():
-    maxlogfile = "maxjob.log"
-    logfiledir = os.path.dirname(maxlogfile)
+def create_logfile_watcher(filepath, callback):
+    """Return an observer thread that notifies on file modification.
 
+    Use start(), stop(), join() on the returned object.
+
+    """
+    logfiledir = os.path.dirname(filepath)
+    handler = LogFileChangedHandler(filepath, callback)
+    observer = observers.Observer()
+    observer.schedule(handler, logfiledir)
+    return observer
+
+
+def test():
     def print_diff(diff):
         if diff:
             print diff
-
-    eventhandler = LogFileChangedHandler(maxlogfile, print_diff)
-    observer = observers.Observer()
-    observer.schedule(eventhandler, logfiledir)
-    observer.start()
+    logfile = os.path.abspath("maxjob.log")
+    watcher = create_logfile_watcher(logfile, print_diff)
+    watcher.start()
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+        watcher.stop()
+    watcher.join()
 
 
 if __name__ == '__main__':
