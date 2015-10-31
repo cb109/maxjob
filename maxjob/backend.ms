@@ -81,22 +81,3 @@ struct maxjob_backend (
 
 global maxjob_backend = maxjob_backend()
 maxjob_backend.init()
-
-
--- Testing.
---
--- We need to find a way to inject the backend instead of loading it
--- via -U MAXScript because the code below should be loaded that way.
-for i = 1 to 100 do (
-    local ranpos = [random -100 100, random -100 100, random -100 100]
-    Teapot pos:ranpos wirecolor:(random black white)
-)
-print "now we will setup the render output"
-rendSaveFile = true
-rendOutputFileName = @"C:\Users\Buelter\Google Drive\dev\maxjob\output.png"
-deleteFile rendOutputFileName
-print "now render the image"
-max quick render
-
-print "nice, lets close max"
-quitMax #noPrompt
