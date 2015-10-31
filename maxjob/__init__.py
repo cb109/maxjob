@@ -1,9 +1,11 @@
 import logging
 import os
+import pprint
 import Queue
 
 from twisted.internet import reactor
 
+from maxjob.config import cfg, get_this_directory
 from maxjob.protocol import MaxJobProcessProtocol
 from maxjob.workers import (LogFileWatcher, MessageQueueWriter,
                             TimedProcessKiller)
@@ -11,18 +13,27 @@ from maxjob.workers import (LogFileWatcher, MessageQueueWriter,
 
 logging.basicConfig(
     format="[%(name)s] - %(asctime)s %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S", level=logging.DEBUG)
+    datefmt="%Y-%m-%d %H:%M:%S", level=logging.INFO)
 log = logging.getLogger("maxjob")
 
 
+def log_config():
+    """Write settings to stdout for debugging purposes."""
+    log.info("chosen settings:")
+    formatted = pprint.pformat(cfg)
+    for line in formatted.split("\n"):
+        log.info(line)
+
+log_config()
+
+
 def main():
-    timeout = 3600  # In seconds, == 1 h.
-    maxbinary = r"C:\Program Files\Autodesk\3ds Max 2015\3dsmax.exe"
-    maxjob_backend = r"C:\Users\Buelter\Google Drive\dev\maxjob\maxjob\backend.ms"
+    maxbinary = cfg.paths.max
+    network_logfile = cfg.paths.networklog
+    mxs_logfile = cfg.paths.maxscriptlog
+    timeout = cfg.options.timeout
 
-    network_logfile = r"C:\Users\Buelter\AppData\Local\Autodesk\3dsMax\2015 - 64bit\ENU\Network\Max.log"
-    mxs_logfile = os.path.abspath("maxjob.log")
-
+    maxjob_backend = os.path.join(get_this_directory(), "backend.ms")
     message_queue = Queue.Queue()
 
     def add_to_message_queue(message, prefix=""):
@@ -35,9 +46,9 @@ def main():
         """Return a list of unstarted thread instances."""
         message_writer = MessageQueueWriter(message_queue)
         netlog_watcher = LogFileWatcher(network_logfile, add_to_message_queue,
-                                        message_prefix="network")
+                                        message_prefix=cfg.prefixes.network)
         mxslog_watcher = LogFileWatcher(mxs_logfile, add_to_message_queue,
-                                        message_prefix="mxs")
+                                        message_prefix=cfg.prefixes.mxs)
         return [message_writer, netlog_watcher, mxslog_watcher]
 
     # Thread references are also used in the reactor cleanup later.

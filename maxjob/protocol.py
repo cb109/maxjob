@@ -1,6 +1,8 @@
 from twisted.internet import protocol
 from twisted.internet import reactor
 
+from maxjob.config import cfg
+
 
 class MaxJobProcessProtocol(protocol.ProcessProtocol):
     """Handle process events for 3ds Max.
@@ -37,10 +39,10 @@ class MaxJobProcessProtocol(protocol.ProcessProtocol):
         print("everything shutdown")
 
     def outReceived(self, data):
-        self.send_via_callback(data, message_prefix="stdout")
+        self.send_via_callback(data, message_prefix=cfg.prefixes.stdout)
 
     def errReceived(self, data):
-        self.send_via_callback(data, message_prefix="stderr")
+        self.send_via_callback(data, message_prefix=cfg.prefixes.stderr)
 
     def processExited(self, reason):
         print("process exited with status: %d" % (reason.value.exitCode))
