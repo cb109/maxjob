@@ -16,6 +16,8 @@ fn maxjob_backend_on_tick s e = (
 
 
 struct maxjob_backend (
+    /***Implement functionality for polling maxscript log changes.***/
+
     _flushtimer,
     _interval = 1000,  -- Milliseconds.
 
@@ -73,7 +75,7 @@ struct maxjob_backend (
         this._init_channels()
         this._init_logfile()
         this._init_flush_timer()
-        ::stdout.print "INFO: maxjob_backend initialized."
+        ::stdout.print "maxjob_backend initialized."
     )
 )
 
