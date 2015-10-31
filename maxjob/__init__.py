@@ -4,6 +4,8 @@ import pprint
 import Queue
 import tempfile
 
+import click
+
 from twisted.internet import reactor
 
 from maxjob.config import cfg, get_this_directory
@@ -36,7 +38,7 @@ fileIn @"{backendfile}"
 
 
 def inject_maxscript_backend(maxscriptfile, backendfile, create_copy=True):
-    """Add an import to the maxscript backend to the script.
+    """Add an import and return the script path, since that may differ.
 
     By default, this is done on a copy of the script so the original is
     not modified. That copy is later used as an argument to 3dsmax.exe.
@@ -55,6 +57,7 @@ def inject_maxscript_backend(maxscriptfile, backendfile, create_copy=True):
         with open(maxscriptfile) as src:
             with open(workfile, "w") as dest:
                 dest.write(src.read())
+
         return workfile
 
     if create_copy:
@@ -66,19 +69,25 @@ def inject_maxscript_backend(maxscriptfile, backendfile, create_copy=True):
     new_content = header.strip() + "\n\n\n" + content
     with open(maxscriptfile, "w") as f:
         f.write(new_content)
+    return maxscriptfile
 
 
-def main():
+@click.command()
+@click.argument("maxscriptfile", type=click.Path(exists=True))
+@click.argument("scenefile", default="", type=click.Path())
+def main(maxscriptfile, scenefile):
+    # Get config settings.
     maxbinary = cfg.paths.max
     network_logfile = cfg.paths.networklog
     mxs_logfile = cfg.paths.maxscriptlog
     timeout = cfg.options.timeout
 
+    # Inject maxscript backend into copy of script.
     log.info("injecting maxscript backend import")
-    maxscriptfile = r"C:\Users\Buelter\Google Drive\dev\maxjob\myscript.ms"
     backendfile = os.path.join(get_this_directory(), "backend.ms")
-    inject_maxscript_backend(maxscriptfile, backendfile)
+    maxscriptfile = inject_maxscript_backend(maxscriptfile, backendfile)
 
+    # Setup logfile watching and report system.
     message_queue = Queue.Queue()
 
     def add_to_message_queue(message, prefix=""):
@@ -96,17 +105,22 @@ def main():
                                         message_prefix=cfg.prefixes.mxs)
         return [message_writer, netlog_watcher, mxslog_watcher]
 
-    # Thread references are also used in the reactor cleanup later.
     threads = create_helper_threads()
     for thread in threads:
         log.info("start worker thread: " + str(thread))
         thread.start()
 
-    # Launch 3ds Max and listen to its standard channels.
+    # Compose arguments and log them for debugging.
     log.info("start max process")
+    args = [os.path.basename(maxbinary), "-U", "MAXScript", maxscriptfile]
+    if scenefile:
+        args.append(scenefile)
+    log.info("the final commandline is:")
+    log.info(" ".join(args))
+
+    # Launch 3ds Max with twisted.
     protocol = MaxJobProcessProtocol(callback=add_to_message_queue,
                                      threads=threads)
-    args = [os.path.basename(maxbinary), "-U", "MAXScript", maxscriptfile]
     env = os.environ.update({"MAXJOB_BACKEND_LOGFILE": mxs_logfile})
     proc = reactor.spawnProcess(protocol, maxbinary, args=args, env=env)
 
