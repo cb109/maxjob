@@ -37,10 +37,10 @@ class MaxJobProcessProtocol(protocol.ProcessProtocol):
         print("everything shutdown")
 
     def outReceived(self, data):
-        self.send_via_callback(data, message_prefix="[out] ")
+        self.send_via_callback(data, message_prefix="stdout")
 
     def errReceived(self, data):
-        self.send_via_callback(data, message_prefix="[err] ")
+        self.send_via_callback(data, message_prefix="stderr")
 
     def processExited(self, reason):
         print("process exited with status: %d" % (reason.value.exitCode))
