@@ -8,4 +8,5 @@ setuptools.setup(name="maxjob",
                                    "twisted",
                                    "psutil",
                                    "easydict",
+                                   "click",
                                    "watchdog"])
