@@ -3,36 +3,48 @@ from twisted.internet import reactor
 
 
 class MaxJobProcessProtocol(protocol.ProcessProtocol):
+    """Handle process events for 3ds Max.
 
-    def __init__(self):
-        self.stdout_history = []
-        self.stderr_history = []
+    The callback is used to put stdout/stderr messages to a queue for
+    organized multithreaded logging. When the process is ended, all
+    given threads are stopped safely as part of the cleanup.
+
+    """
+    def __init__(self, callback=None, threads=None):
+        self.callback = callback
+        self.threads = threads
+
+    def send_via_callback(self, data, message_prefix=""):
+        if not self.callback:
+            return
+        lines = data.split("\n")
+        lines = [line.strip() + "\n" for line in lines if line != ""]
+        for line in lines:
+            self.callback(line, prefix=message_prefix)
+
+    def cleanup(self):
+        if self.threads:
+            print("stopping associated helper threads...\n")
+            for thread in self.threads:
+                print "stop thread:", thread
+                thread.stop()
+                thread.join()
+
+    def shutdown(self):
+        print("quitting...\n")
+        self.cleanup()
+        reactor.stop()
+        print("everything shutdown")
 
     def outReceived(self, data):
-        lines = data.split("\n")
-        lines = [line.strip() for line in lines]
-        lines = filter(lambda line: line != "", lines)
-        self.stdout_history.extend(line)
-        for line in lines:
-            print "stdout:", line
+        self.send_via_callback(data, message_prefix="[out] ")
 
     def errReceived(self, data):
-        lines = data.split("\n")
-        lines = [line.strip() for line in lines]
-        lines = filter(lambda line: line != "", lines)
-        self.stderr_history.extend(line)
-        for line in lines:
-            print "stderr:", line
+        self.send_via_callback(data, message_prefix="[err] ")
 
     def processExited(self, reason):
-        print "processExited, status %d" % (reason.value.exitCode,)
+        print("process exited with status: %d" % (reason.value.exitCode))
 
     def processEnded(self, reason):
-        print "processEnded, status %d" % (reason.value.exitCode,)
-        print "quitting"
-        reactor.stop()
-
-    # def suicide(self):
-    #     self.transport.signalProcess(signal.SIGTERM)
-    #     self.transport.signalProcess(signal.SIGKILL)
-    #     self.transport.signalProcess("KILL")
+        print("process ended with status: %d" % (reason.value.exitCode))
+        self.shutdown()
