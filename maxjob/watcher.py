@@ -9,7 +9,7 @@ class LogFileChangedHandler(events.PatternMatchingEventHandler):
 
     We assume that this logfile is only modified in that lines are
     added to it, not modified or removed. This really simplifies the
-    diff. Whenever that happens, this handler send the diff through the
+    diff. Whenever that happens, this handler sends the diff through the
     callback function.
 
     """
