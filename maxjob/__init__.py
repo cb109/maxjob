@@ -67,11 +67,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-"""
-
-inject via copying backend-load script to early startup location?
-or by creating a copy of the wanted script and adding a filein on top (log that)?
-
-"""
