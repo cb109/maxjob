@@ -7,4 +7,5 @@ setuptools.setup(name="maxjob",
                  install_requires=["pypiwin32",
                                    "twisted",
                                    "psutil",
+                                   "easydict",
                                    "watchdog"])
