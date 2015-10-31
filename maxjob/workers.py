@@ -123,22 +123,3 @@ class TimedProcessKiller(_BaseThread):
             if self.timeout_reached:
                 self.kill_process()
                 self.stop()
-
-
-def test():
-    def print_diff(diff):
-        if diff:
-            print diff
-    logfile = os.path.abspath("maxjob.log")
-    watcher = LogFileWatcher(logfile, print_diff)
-    watcher.start()
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        watcher.stop()
-    watcher.join()
-
-
-if __name__ == '__main__':
-    test()
