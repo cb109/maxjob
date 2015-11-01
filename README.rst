@@ -37,4 +37,4 @@ Usage
 
 Modify *maxjob.yml* to your needs, then call::
 
-    $ python -m maxjob [MAXSCRIPTFILE] [SCENEFILE]
+    $ maxjob [MAXSCRIPTFILE] [SCENEFILE]
