@@ -27,10 +27,10 @@ log = logging.getLogger("maxjob")
 
 def log_config():
     """Write settings to stdout for debugging purposes."""
-    log.info("chosen settings:")
+    log.debug("chosen settings:")
     formatted = pprint.pformat(cfg)
     for line in formatted.split("\n"):
-        log.info(line)
+        log.debug(line)
 
 log_config()
 
@@ -148,7 +148,7 @@ class maxjob(object):
         self.maxscriptfile = os.path.abspath(maxscriptfile)
         self.scenefile = scenefile
         self.backendfile = os.path.abspath(
-            os.path.join(get_this_directory(), "backend.ms"))
+            os.path.join(get_this_directory(unpacked=True), "backend.ms"))
         # All inputs set, go for it.
         self.inject_maxscript_backend()
         self.setup_messaging()
