@@ -1,3 +1,5 @@
+"""Implement the maxjob tool and its commandline interface."""
+
 import logging
 import os
 import pprint

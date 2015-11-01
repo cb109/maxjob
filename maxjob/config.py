@@ -1,3 +1,5 @@
+"""Read and hold the settings from the config file."""
+
 import os
 import sys
 
