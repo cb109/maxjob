@@ -37,8 +37,7 @@ Build
 
 The tool can be build into a single *maxjob.exe*::
 
-    $ pyinstaller maxjob.spec
-    $ cp maxjob.yml dist
+    $ . build.sh
 
 The *maxjob.yml* must reside next to the *maxjob.exe*.
 
