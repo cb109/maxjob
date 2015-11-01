@@ -27,10 +27,10 @@ log = logging.getLogger("maxjob")
 
 def log_config():
     """Write settings to stdout for debugging purposes."""
-    log.info("chosen settings:")
+    log.debug("chosen settings:")
     formatted = pprint.pformat(cfg)
     for line in formatted.split("\n"):
-        log.info(line)
+        log.debug(line)
 
 log_config()
 
@@ -60,7 +60,7 @@ class maxjob(object):
         """
         def create_copy():
             """Create a copy like from 'myscript.ms' to
-            'tmpgz7pir.myscript.ms'in the local appdata directory.
+            'tmpgz7pir.myscript.ms' in the local appdata directory.
             """
             filename, ext = os.path.splitext(self.maxscriptfile)
             suffix = "." + os.path.basename(filename) + ext
@@ -133,6 +133,8 @@ class maxjob(object):
 
     def setup_process_timeout(self):
         """Forcefully end the process if we reach the timeout."""
+        if self.timeout <= 0:  # User disabled this, do nothing.
+            return
         killer = TimedProcessKiller(self.proc.pid, self.timeout)
         self.threads.append(killer)
         log.info("start timeout thread: " + str(killer))
@@ -148,7 +150,7 @@ class maxjob(object):
         self.maxscriptfile = os.path.abspath(maxscriptfile)
         self.scenefile = scenefile
         self.backendfile = os.path.abspath(
-            os.path.join(get_this_directory(), "backend.ms"))
+            os.path.join(get_this_directory(unpacked=True), "backend.ms"))
         # All inputs set, go for it.
         self.inject_maxscript_backend()
         self.setup_messaging()

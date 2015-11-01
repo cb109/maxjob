@@ -13,12 +13,21 @@ from easydict import EasyDict
 configfile = "maxjob.yml"
 
 
-def get_this_directory():
-    """Support querying from inside an executable."""
+def get_this_directory(unpacked=False):
+    """Support querying from inside an executable.
+
+    unpacked: When frozen, use the unpacked temp directory instead of
+        the one where the .exe distribution resides in. This is needed
+        for bundles files vs files that must lie next to the .exe.
+
+    """
     if getattr(sys, 'frozen', False):
-        thisdir = os.path.dirname(sys.executable)
+        if unpacked:
+            thisdir = os.path.abspath(sys._MEIPASS)
+        else:
+            thisdir = os.path.abspath(sys.executable)
     else:
-        thisdir = os.path.dirname(__file__)
+        thisdir = os.path.dirname(os.path.abspath(__file__))
     return thisdir
 
 

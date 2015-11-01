@@ -4,7 +4,7 @@ paths:
     maxscriptlog: '%LOCALAPPDATA%\Autodesk\3dsMax\2015 - 64bit\ENU\maxjob_mxs.log'
 
 options:
-    timeout: 3600
+    timeout: -1
 
 prefixes:
     stdout: stdout

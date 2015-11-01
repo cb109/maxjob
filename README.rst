@@ -32,9 +32,19 @@ The following steps install the tool from a bash::
     $ python setup.py install
 
 
+Build
+-----
+
+The tool can be build into a single *maxjob.exe*::
+
+    $ . build.sh
+
+The *maxjob.yml* must reside next to the *maxjob.exe*.
+
+
 Usage
 -----
 
 Modify *maxjob.yml* to your needs, then call::
 
-    $ python -m maxjob [MAXSCRIPTFILE] [SCENEFILE]
+    $ maxjob [MAXSCRIPTFILE] [SCENEFILE]

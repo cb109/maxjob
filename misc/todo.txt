@@ -1,9 +1,7 @@
-- inject via copying backend-load script to early startup location?
-  or by creating a copy of the wanted script and adding a filein on top (log that)?
-- add CLI with options like mxs/py script, max version, usual flags like -server etc.
+- add CLI with options like mxs/py script, max version, usual flags like -server, auto-shutdown etc.
 - try to find sane defaults like the max version e.g. by looking at the registry
 - think about configuration via cmdline args, config file, env vars, ...
 - all output should probably be put in a file by default.
 - use logging everywhere, probably also for logging to file and handling the queue
 - make sure to document limitations (e.g. openLog() etc.)
-- it might be nice to have a one file .exe build of this once the CLI is there
+- copying the maxscript may be a problem when trying to use getThisScriptFileName() so it should be optional (but then we have to modify it), or in the same directory

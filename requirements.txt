@@ -1,0 +1,8 @@
+click==5.1
+easydict==1.6
+psutil==3.2.2
+PyInstaller==2.1
+pypiwin32==219
+PyYAML==3.11
+twisted==15.3.0
+watchdog==0.8.3
