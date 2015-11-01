@@ -32,6 +32,17 @@ The following steps install the tool from a bash::
     $ python setup.py install
 
 
+Build
+-----
+
+The tool can be build into a single *maxjob.exe*::
+
+    $ pyinstaller maxjob.spec
+    $ cp maxjob.yml dist
+
+The *maxjob.yml* must reside next to the *maxjob.exe*.
+
+
 Usage
 -----
 
