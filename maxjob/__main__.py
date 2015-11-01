@@ -60,7 +60,7 @@ class maxjob(object):
         """
         def create_copy():
             """Create a copy like from 'myscript.ms' to
-            'tmpgz7pir.myscript.ms'in the local appdata directory.
+            'tmpgz7pir.myscript.ms' in the local appdata directory.
             """
             filename, ext = os.path.splitext(self.maxscriptfile)
             suffix = "." + os.path.basename(filename) + ext
