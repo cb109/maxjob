@@ -38,7 +38,7 @@ fileIn @"{backendfile}"
 
 
 class maxjob(object):
-    """Method object to setup and run the tool.."""
+    """Method object to setup and run the tool."""
 
     def __init__(self):
         self.maxbinary = cfg.paths.max
