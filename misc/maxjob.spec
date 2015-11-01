@@ -17,4 +17,4 @@ exe = EXE(pyz,
           debug=False,
           strip=None,
           upx=True,
-          console=True, icon='max.ico')
+          console=True, icon='misc/max.ico')

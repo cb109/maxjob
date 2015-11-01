@@ -4,3 +4,4 @@
 - all output should probably be put in a file by default.
 - use logging everywhere, probably also for logging to file and handling the queue
 - make sure to document limitations (e.g. openLog() etc.)
+- copying the maxscript may be a problem when trying to use getThisScriptFileName() so it should be optional (but then we have to modify it), or in the same directory
