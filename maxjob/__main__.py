@@ -133,6 +133,8 @@ class maxjob(object):
 
     def setup_process_timeout(self):
         """Forcefully end the process if we reach the timeout."""
+        if self.timeout <= 0:  # User disabled this, do nothing.
+            return
         killer = TimedProcessKiller(self.proc.pid, self.timeout)
         self.threads.append(killer)
         log.info("start timeout thread: " + str(killer))
