@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# :coding: utf-8
+
+"""Read and hold the settings from the config file."""
+
 import os
 import sys
 

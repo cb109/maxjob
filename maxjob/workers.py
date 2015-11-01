@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# :coding: utf-8
+"""Implement different thread-based helper classes.
+
+    - LogFileWatcher: Watch a single file for new lines added to it.
+    - TimedProcessKiller: Kill a process when a timeout is reached.
+    - MessageQueueWriter: Log messages from a queue that is filled
+                          by multiple threads.
+"""
 import os
 import psutil
 import Queue
