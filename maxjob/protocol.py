@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# :coding: utf-8
+
 """Implement a protocol to handle events for the 3ds Max process."""
 
 from twisted.internet import protocol

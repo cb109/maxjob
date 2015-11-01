@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# :coding: utf-8
+
 """Implement the maxjob tool and its commandline interface."""
 
 import logging
@@ -162,7 +165,7 @@ api = maxjob()
 @click.argument("maxscriptfile", type=click.Path(exists=True))
 @click.argument("scenefile", default="", type=click.Path())
 def cli(maxscriptfile, scenefile):
-    """Expose the commandline interface."""
+    """Launch 3ds Max and execute a maxscript file."""
     api.main(maxscriptfile, scenefile)
 
 
