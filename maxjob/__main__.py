@@ -7,9 +7,6 @@ import logging
 import os
 import pprint
 import Queue
-import pipes
-
-
 import click
 
 from twisted.internet import reactor
@@ -32,8 +29,6 @@ def log_config():
     formatted = pprint.pformat(cfg)
     for line in formatted.split("\n"):
         log.debug(line)
-
-log_config()
 
 
 class maxjob(object):
@@ -102,8 +97,6 @@ class maxjob(object):
         self.env = os.environ.update(
             {"MAXJOB_BACKEND_LOGFILE": self.mxs_logfile})
         final_args = [os.path.basename(self.maxbinary)] + self.args
-        for arg in final_args:
-            print arg
         self.proc = reactor.spawnProcess(protocol, self.maxbinary,
                                          args=final_args, env=self.env)
 
@@ -141,8 +134,12 @@ api = maxjob()
 @click.command()
 @click.argument("maxscriptfile", type=click.Path(exists=True))
 @click.argument("scenefile", type=click.Path(), default="")
-def cli(maxscriptfile, scenefile):
+@click.option("-v", "--verbose", is_flag=True)
+def cli(maxscriptfile, scenefile, verbose):
     """Launch 3ds Max and execute a maxscript file."""
+    if verbose:
+        log.setLevel(logging.DEBUG)
+    log_config()
     api.main(maxscriptfile, scenefile)
 
 
