@@ -7,7 +7,8 @@ import logging
 import os
 import pprint
 import Queue
-import tempfile
+import pipes
+
 
 import click
 
@@ -35,13 +36,6 @@ def log_config():
 log_config()
 
 
-INJECT_MXS_BACKEND_TEMPLATE = """
--- This fileIn() has been injected by the maxjob tool.
--- It is needed to load functionality so we can read the mxs log.
-fileIn @"{backendfile}"
-"""
-
-
 class maxjob(object):
     """Method object to setup and run the tool."""
 
@@ -51,40 +45,17 @@ class maxjob(object):
         self.mxs_logfile = cfg.paths.maxscriptlog
         self.timeout = cfg.options.timeout
 
-    def inject_maxscript_backend(self, create_copy=True):
-        """Add an import command to the maxscript.
-
-        By default, this is done on a copy of the script so the original is
-        not modified. That copy is later used as an argument to 3dsmax.exe.
-
+    def _create_bootstrap_maxscript_line(self):
+        """Return a maxscript to run the scripts and quit afterwards.
         """
-        def create_copy():
-            """Create a copy like from 'myscript.ms' to
-            'tmpgz7pir.myscript.ms' in the local appdata directory.
-            """
-            filename, ext = os.path.splitext(self.maxscriptfile)
-            suffix = "." + os.path.basename(filename) + ext
-            workfile_obj = tempfile.NamedTemporaryFile(prefix="maxjob-",
-                                                       suffix=suffix,
-                                                       delete=False)
-            workfile_obj.close()
-            workfile = workfile_obj.name
-            with open(self.maxscriptfile) as src:
-                with open(workfile, "w") as dest:
-                    dest.write(src.read())
+        def wrap(path):
+            """Return a path safe to use on the windows cmdline."""
+            return os.path.abspath(path).replace("\\", "\\" * 2)
 
-            return workfile
-
-        if create_copy:
-            self.maxscriptfile = create_copy()
-
-        with open(self.maxscriptfile) as f:
-            content = f.read()
-        header = INJECT_MXS_BACKEND_TEMPLATE.format(
-            backendfile=self.backendfile)
-        new_content = header.strip() + "\n\n\n" + content
-        with open(self.maxscriptfile, "w") as f:
-            f.write(new_content)
+        line = ("fileIn @\"" + wrap(self.backendfile) + "\"; "
+                "fileIn @\"" + wrap(self.maxscriptfile) + "\"; "
+                "quitMax #noPrompt")
+        return line
 
     def _add_to_message_queue(self, message, prefix=""):
         """Enqueue message, optionally adding a formatted prefix."""
@@ -114,12 +85,14 @@ class maxjob(object):
     def compose_arguments(self):
         """Compose arguments and log them for debugging."""
         log.info("start max process")
-        self.args = [os.path.basename(self.maxbinary),
-                     "-U", "MAXScript", self.maxscriptfile]
+        bootstrap_mxs = self._create_bootstrap_maxscript_line()
+        self.args = ["-mxs", bootstrap_mxs]
         if self.scenefile:
             self.args.append(self.scenefile)
+        full_maxpath = "\"" + self.maxbinary + "\""
+        final_cmdline = full_maxpath + " " + " ".join(self.args)
         log.info("the final commandline is:")
-        log.info(" ".join(self.args))
+        log.info(final_cmdline)
 
     def launch_max_process(self):
         """Launch wrapped 3ds Max with the composed arguments."""
@@ -128,8 +101,11 @@ class maxjob(object):
                                          threads=self.threads)
         self.env = os.environ.update(
             {"MAXJOB_BACKEND_LOGFILE": self.mxs_logfile})
+        final_args = [os.path.basename(self.maxbinary)] + self.args
+        for arg in final_args:
+            print arg
         self.proc = reactor.spawnProcess(protocol, self.maxbinary,
-                                         args=self.args, env=self.env)
+                                         args=final_args, env=self.env)
 
     def setup_process_timeout(self):
         """Forcefully end the process if we reach the timeout."""
@@ -152,7 +128,6 @@ class maxjob(object):
         self.backendfile = os.path.abspath(
             os.path.join(get_this_directory(unpacked=True), "backend.ms"))
         # All inputs set, go for it.
-        self.inject_maxscript_backend()
         self.setup_messaging()
         self.compose_arguments()
         self.launch_max_process()
@@ -165,7 +140,7 @@ api = maxjob()
 
 @click.command()
 @click.argument("maxscriptfile", type=click.Path(exists=True))
-@click.argument("scenefile", default="", type=click.Path())
+@click.argument("scenefile", type=click.Path(), default="")
 def cli(maxscriptfile, scenefile):
     """Launch 3ds Max and execute a maxscript file."""
     api.main(maxscriptfile, scenefile)
