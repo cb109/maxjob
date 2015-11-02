@@ -41,16 +41,15 @@ class maxjob(object):
         self.timeout = cfg.options.timeout
 
     def _create_bootstrap_maxscript_line(self):
-        """Return a maxscript to run the scripts and quit afterwards.
+        """Return a maxscript line to run the needed scripts.
         """
         def wrap(path):
             """Return a path safe to use on the windows cmdline."""
             return os.path.abspath(path).replace("\\", "\\" * 2)
 
         line = ("fileIn @\"" + wrap(self.backendfile) + "\"; "
-                "fileIn @\"" + wrap(self.maxscriptfile) + "\"; "
-                "quitMax #noPrompt")
-        return line
+                "fileIn @\"" + wrap(self.maxscriptfile) + "\"; ")
+        return line.strip()
 
     def _add_to_message_queue(self, message, prefix=""):
         """Enqueue message, optionally adding a formatted prefix."""
@@ -68,6 +67,21 @@ class maxjob(object):
             self.mxs_logfile, self._add_to_message_queue,
             message_prefix=cfg.prefixes.mxs)
         return [message_writer, netlog_watcher, mxslog_watcher]
+
+    def setup_files(self, maxscriptfile, scenefile):
+        """Prepare the input filepaths."""
+        self.maxscriptfile = os.path.abspath(maxscriptfile)
+        log.info("maxscript file is:")
+        log.info(self.maxscriptfile)
+
+        scenefile = scenefile or ""
+        self.scenefile = os.path.abspath(scenefile)
+        if scenefile:
+            log.info("scenefile is:")
+            log.info(self.scenefile)
+
+        self.backendfile = os.path.abspath(
+            os.path.join(get_this_directory(unpacked=True), "backend.ms"))
 
     def setup_messaging(self):
         """Initiate logfile watching and re-logging."""
@@ -116,10 +130,7 @@ class maxjob(object):
 
     def main(self, maxscriptfile, scenefile):
         """Facade to setup and run the tool."""
-        self.maxscriptfile = os.path.abspath(maxscriptfile)
-        self.scenefile = scenefile
-        self.backendfile = os.path.abspath(
-            os.path.join(get_this_directory(unpacked=True), "backend.ms"))
+        self.setup_files(maxscriptfile, scenefile)
         # All inputs set, go for it.
         self.setup_messaging()
         self.compose_arguments()
