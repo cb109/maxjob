@@ -48,3 +48,11 @@ Usage
 Modify *maxjob.yml* to your needs, then call::
 
     $ maxjob [MAXSCRIPTFILE] [SCENEFILE]
+
+
+Test
+----
+
+You need 3ds Max installed and its path configured in the maxjob.yml::
+
+    py.test tests -v [-s]
