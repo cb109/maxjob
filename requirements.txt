@@ -1,7 +1,7 @@
 click==5.1
 easydict==1.6
 psutil==3.2.2
-PyInstaller==2.1
+-e git+http://github.com/pyinstaller/pyinstaller.git@618b7f064db9ebfcb5361cc17b429c2aa4096cbc#egg=pyinstaller
 pypiwin32==219
 PyYAML==3.11
 twisted==15.3.0
