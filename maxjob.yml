@@ -5,6 +5,10 @@ paths:
 
 options:
     timeout: -1
+    max_default_args:
+        - '-server'
+        - '-mip'
+        - '-q'
 
 prefixes:
     stdout: stdout

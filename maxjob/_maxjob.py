@@ -91,11 +91,29 @@ class _maxjob(object):
             log.info("start worker thread: " + str(thread))
             thread.start()
 
+    def _get_default_args(self):
+        """Return the 3dsmax.exe default args from the config.
+
+        Here we make sure -mxs is ignored as we add it ourselves.
+        Do not fail if the max_default_args option does not exist.
+
+        """
+        filtered = []
+        try:
+            args = cfg.options.max_default_args
+        except AttributeError:
+            return filtered
+        for arg in args:
+            if not arg.startswith("-mxs"):
+                filtered.append(arg)
+        return filtered
+
     def compose_arguments(self):
         """Compose arguments and log them for debugging."""
         log.info("start max process")
         bootstrap_mxs = self._create_bootstrap_maxscript_line()
-        self.args = ["-mxs", bootstrap_mxs]
+        default_args = self._get_default_args()
+        self.args = default_args + ["-mxs", bootstrap_mxs]
         if self.scenefile:
             self.args.append(self.scenefile)
         full_maxpath = "\"" + self.maxbinary + "\""
@@ -110,7 +128,8 @@ class _maxjob(object):
                                          threads=self.threads)
         self.env = os.environ.update(
             {"MAXJOB_BACKEND_LOGFILE": self.mxs_logfile})
-        final_args = [os.path.basename(self.maxbinary)] + self.args
+        final_args = (
+            [os.path.basename(self.maxbinary)] + self.args)
         self.proc = reactor.spawnProcess(protocol, self.maxbinary,
                                          args=final_args, env=self.env)
 
