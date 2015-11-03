@@ -38,9 +38,9 @@ You can change the 3ds Max version and other settings in the *maxjob.yml*.
 Known Limitations
 -----------------
 
-- By default, maxjob launches 3ds Max like a user would, consuming a license. You can configure it to launch in '-server' mode instead, but this will take away the maxscript log from the output (the most interesting part of it).
+- By default, maxjob launches 3ds Max like a user would which consumes a license. You can configure it to launch in '-server' mode instead, but this will take away the maxscript log from the output (the most interesting part of it).
 - maxjob uses the *-mxs* flag internally, which will **shutdown** 3ds Max after the script has been executed.
-
+- The maxscript log is redirected from inside 3ds Max using *openLog <mxs.log>*. Since this is limited to one file at a time, you cannot use it in your own scripts without taking away the maxscript log from maxjob.
 
 Installation
 ------------
@@ -76,3 +76,13 @@ Test
 You need 3ds Max installed and its path configured in the *maxjob.yml*::
 
     py.test tests -v [-s]
+
+
+ToDo
+----
+
+- Add support for python scripts.
+- Think about configuration via cmdline args, env vars etc.
+- Try to find sane defaults like the max version e.g. by looking at the registry.
+- All output should probably be put in a file by default.
+- Use logging everywhere, probably also for logging to file and handling the queue.
