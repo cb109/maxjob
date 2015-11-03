@@ -19,4 +19,6 @@ deleteFile rendOutputFileName
 print "now render the image"
 max quick render
 
+print ("image exists: " + (doesFileExist rendOutputFileName) as string)
+
 print "nice, we are done here"
