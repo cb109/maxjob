@@ -6,7 +6,7 @@ import setuptools
 
 setuptools.setup(
     name="maxjob",
-    version="0.1.2",
+    version="0.1.3",
     description="Start 3ds Max from the commandline to do a maxscript job.",
     long_description=open("README.rst").read(),
     author="Christoph Buelter",

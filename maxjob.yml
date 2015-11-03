@@ -5,6 +5,12 @@ paths:
 
 options:
     timeout: -1
+    max_default_args:
+        - '-q'
+        - '-mip'
+        # Enable -server mode to not consume a license,
+        # at the price of losing the maxscript log.
+        # - '-server'
 
 prefixes:
     stdout: stdout
