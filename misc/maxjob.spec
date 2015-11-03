@@ -1,5 +1,5 @@
 # -*- mode: python -*-
-a = Analysis(['maxjob/__main__.py'],
+a = Analysis(['maxjob/_maxjob.py'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)

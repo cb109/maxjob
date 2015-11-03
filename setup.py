@@ -15,5 +15,5 @@ setuptools.setup(
     keywords="3d, 3dsmax, 3dsmaxcmd, maxscript, dcc, render, batch",
     packages=setuptools.find_packages(),
     install_requires=open("requirements.txt").readlines(),
-    entry_points={"console_scripts": ["maxjob=maxjob.__main__:cli"]}
+    entry_points={"console_scripts": ["maxjob=maxjob._maxjob:cli"]}
 )
